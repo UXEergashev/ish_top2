@@ -238,11 +238,11 @@ function handleRegister(event) {
 }
 
 function redirectToDashboard() {
-    if (appState.userType === 'worker') {
-        window.location.href = 'worker-dashboard.html';
-    } else if (appState.userType === 'employer') {
-        window.location.href = 'employer-dashboard.html';
-    }
+    const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    const targetFile = appState.userType === 'worker' ? 'worker-dashboard.html' : 'employer-dashboard.html';
+
+    console.log('Redirecting to:', path + targetFile);
+    window.location.href = targetFile; // relative path usually works better for static sites
 }
 
 function logout() {
