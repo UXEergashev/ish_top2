@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishchi Dashboard - TrustID | Kunlik Ish Topish Platformasi</title>
+    <meta name="description"
+        content="TrustID - O'zbekistonda eng ishonchli kunlik ish topish platformasi. AI asosida mos ishlar, kafolatli to'lov.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="worker-new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+    <!-- Mobile Hamburger -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" fill="url(#gradient1)" />
+                        <path d="M20 10L25 15H22V25H18V15H15L20 10Z" fill="white" />
+                        <path d="M12 28H28V30H12V28Z" fill="white" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#6366f1" />
+                                <stop offset="100%" stop-color="#8b5cf6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">TrustID</span>
+                </div>
+                <!-- LinkedIn-style "Open to Work" toggle -->
+                <div class="open-to-work-toggle" id="openToWorkContainer">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="openToWorkSwitch" onchange="toggleOpenToWork(this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label" id="openToWorkLabel">Ish qidirmoqman</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+                    <span class="nav-icon">🏠</span>
+                    <span>Bosh sahifa</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('jobs')" id="nav-jobs">
+                    <span class="nav-icon">🔍</span>
+                    <span>Ish qidirish</span>
+                    <span class="nav-badge" id="jobsBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('saved')" id="nav-saved">
+                    <span class="nav-icon">❤️</span>
+                    <span>Saqlangan</span>
+                    <span class="nav-badge" id="savedBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('applications')" id="nav-applications">
+                    <span class="nav-icon">📝</span>
+                    <span>Murojaatlarim</span>
+                    <span class="nav-badge" id="appsBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('contracts')" id="nav-contracts">
+                    <span class="nav-icon">📄</span>
+                    <span>Shartnomalar</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('earnings')" id="nav-earnings">
+                    <span class="nav-icon">💰</span>
+                    <span>Daromad</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('reviews')" id="nav-reviews">
+                    <span class="nav-icon">⭐</span>
+                    <span>Sharhlar</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('profile')" id="nav-profile">
+                    <span class="nav-icon">👤</span>
+                    <span>Profil</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('alerts')" id="nav-alerts">
+                    <span class="nav-icon">🔔</span>
+                    <span>Bildirishnomalar</span>
+                    <span class="nav-badge alert-badge" id="alertsBadge" style="display:none">!</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-premium-side" onclick="showPremiumUpgrade()">
+                    ⭐ Premium olish
+                </button>
+                <button class="btn-danger" onclick="logout()" style="width: 100%; margin-top: 0.5rem;">
+                    <span>🚪</span> Chiqish
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Bosh sahifa</h1>
+                    <p class="header-subtitle" id="pageSubtitle">Bugungi ish imkoniyatlari</p>
+                </div>
+                <div class="header-right">
+                    <!-- Indeed-style search bar in header -->
+                    <div class="header-search" id="headerSearch">
+                        <input type="text" id="quickSearch" placeholder="🔍 Ish qidiring..."
+                            oninput="quickSearchJobs(this.value)">
+                    </div>
+                    <button class="btn-secondary notification-btn" onclick="showSection('alerts')" id="notifBtn">
+                        🔔
+                        <span class="notif-dot" id="notifDot" style="display:none"></span>
+                    </button>
+                    <button class="btn-secondary premium-btn" onclick="showPremiumUpgrade()">
+                        ⭐ Premium
+                    </button>
+                    <div class="balance-card">
+                        <span class="balance-label">Balans:</span>
+                        <span class="balance-value" id="userBalance">0 so'm</span>
+                    </div>
+                    <div class="user-avatar" id="userAvatar" onclick="showSection('profile')" style="cursor:pointer">
+                        <span id="userInitials">?</span>
+                        <div class="online-indicator" id="onlineIndicator"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ===== DASHBOARD SECTION ===== -->
+            <section id="section-dashboard" class="content-section active">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99,102,241,0.2);">💼</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalJobs">0</div>
+                            <div class="stat-label">Faol ishlar</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16,185,129,0.2);">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="completedJobs">0</div>
+                            <div class="stat-label">Tugallangan</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245,158,11,0.2);">⭐</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="userRating">0.0</div>
+                            <div class="stat-label">Reyting</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(236,72,153,0.2);">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalEarnings">0</div>
+                            <div class="stat-label">Jami daromad (so'm)</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6,182,212,0.2);">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="profileCompletion">0%</div>
+                            <div class="stat-label">Profil to'liqligi</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Completion Bar (LinkedIn-style) -->
+                <div class="profile-completion-card" id="profileCompletionCard">
+                    <div class="completion-header">
+                        <span>👤 Profilingizni to'ldiring</span>
+                        <span id="completionPercent">0%</span>
+                    </div>
+                    <div class="completion-bar">
+                        <div class="completion-fill" id="completionFill" style="width:0%"></div>
+                    </div>
+                    <div class="completion-tips" id="completionTips"></div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- AI Recommended Jobs -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">🤖 AI Tavsiya etilgan ishlar</h2>
+                            <button class="btn-secondary btn-small" onclick="showSection('jobs')">Barchasini ko'rish
+                                →</button>
+                        </div>
+                        <div id="recommendedJobs" class="job-list"></div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Job Alerts (Indeed-style) -->
+                        <div class="card">
+                            <h2 class="card-title">🔔 Ish ogohlantirishlari</h2>
+                            <div id="jobAlerts" class="alerts-list"></div>
+                            <button class="btn-primary btn-small" style="margin-top:1rem; width:100%"
+                                onclick="createJobAlert()">
+                                + Yangi ogohlantirish
+                            </button>
+                        </div>
+
+                        <!-- Today's Jobs (Urgent) -->
+                        <div class="card">
+                            <h2 class="card-title">⚡ Bugungi shoshilinch ishlar</h2>
+                            <div id="urgentJobs" class="job-list"></div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="card">
+                            <h2 class="card-title">📈 So'nggi faoliyat</h2>
+                            <div id="recentActivity" class="activity-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== JOB SEARCH SECTION (Indeed-style) ===== -->
+            <section id="section-jobs" class="content-section">
+                <!-- Advanced Search Bar (Indeed-style) -->
+                <div class="indeed-search-bar">
+                    <div class="search-field">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchQuery" placeholder="Kasb, ko'nikma yoki kompaniya nomi..."
+                            oninput="liveSearchJobs()">
+                    </div>
+                    <div class="search-divider"></div>
+                    <div class="search-field">
+                        <span class="search-icon">📍</span>
+                        <input type="text" id="searchLocation" placeholder="Shahar yoki tuman..."
+                            oninput="liveSearchJobs()">
+                    </div>
+                    <button class="btn-search" onclick="liveSearchJobs()">Qidirish</button>
+                </div>
+
+                <!-- Filter Tags (quick filters) -->
+                <div class="filter-tags">
+                    <span class="filter-tag active" onclick="filterByTag('all', this)">Barchasi</span>
+                    <span class="filter-tag" onclick="filterByTag('Qurilish', this)">🏗️ Qurilish</span>
+                    <span class="filter-tag" onclick="filterByTag('Elektrik', this)">⚡ Elektrik</span>
+                    <span class="filter-tag" onclick="filterByTag('Santexnik', this)">🔧 Santexnik</span>
+                    <span class="filter-tag" onclick="filterByTag('Bog\'dorchilik', this)">🌿 Bog'</span>
+                    <span class="filter-tag" onclick="filterByTag('Duradgorlik', this)">🪚 Duradgor</span>
+                    <span class="filter-tag" onclick="filterByTag('Oshpazlik', this)">👨‍🍳 Oshpaz</span>
+                    <span class="filter-tag urgent-tag" onclick="filterByUrgent(this)">⚡ Shoshilinch</span>
+                    <span class="filter-tag" onclick="filterByEscrow(this)">🛡️ Kafolatli</span>
+                </div>
+
+                <!-- Sort & Count bar -->
+                <div class="jobs-toolbar">
+                    <div class="jobs-count" id="jobsCount">Ishlar yuklanmoqda...</div>
+                    <div class="sort-options">
+                        <select id="sortJobs" onchange="sortAndRenderJobs()" class="sort-select">
+                            <option value="ai">🤖 AI Mos kelish</option>
+                            <option value="salary_high">💰 Yuqori maosh</option>
+                            <option value="salary_low">💰 Past maosh</option>
+                            <option value="newest">🕐 Yangi</option>
+                            <option value="urgent">⚡ Shoshilinch</option>
+                        </select>
+                        <button class="view-toggle" onclick="toggleJobView('grid')" id="gridViewBtn"
+                            title="Grid ko'rinish">⊞</button>
+                        <button class="view-toggle active" onclick="toggleJobView('list')" id="listViewBtn"
+                            title="Ro'yxat ko'rinish">≡</button>
+                    </div>
+                </div>
+
+                <div class="jobs-layout">
+                    <!-- Jobs list -->
+                    <div id="jobsList" class="jobs-list-container"></div>
+
+                    <!-- Job Detail Panel (Indeed-style right panel) -->
+                    <div class="job-detail-panel" id="jobDetailPanel">
+                        <div class="job-detail-placeholder">
+                            <div style="font-size:3rem; margin-bottom:1rem;">💼</div>
+                            <h3>Ish tanlang</h3>
+                            <p>Batafsil ma'lumot ko'rish uchun ish kartasini bosing</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SAVED JOBS SECTION ===== -->
+            <section id="section-saved" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">❤️ Saqlangan ishlar</h2>
+                        <span id="savedCount" class="count-badge">0 ta</span>
+                    </div>
+                    <div id="savedJobsList" class="jobs-list-container"></div>
+                </div>
+            </section>
+
+            <!-- ===== APPLICATIONS SECTION ===== -->
+            <section id="section-applications" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📝 Murojaatlarim</h2>
+                        <div class="app-filter-tabs">
+                            <button class="tab-btn active" onclick="filterApps('all', this)">Barchasi</button>
+                            <button class="tab-btn" onclick="filterApps('pending', this)">⏳ Kutilmoqda</button>
+                            <button class="tab-btn" onclick="filterApps('accepted', this)">✅ Qabul</button>
+                            <button class="tab-btn" onclick="filterApps('rejected', this)">❌ Rad</button>
+                        </div>
+                    </div>
+                    <div id="applicationsList" class="applications-list"></div>
+                </div>
+            </section>
+
+            <!-- ===== CONTRACTS SECTION ===== -->
+            <section id="section-contracts" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📄 Shartnomalar</h2>
+                        <div class="contract-filter-tabs">
+                            <button class="tab-btn active" onclick="filterContracts('all', this)">Barchasi</button>
+                            <button class="tab-btn" onclick="filterContracts('active', this)">🟢 Faol</button>
+                            <button class="tab-btn" onclick="filterContracts('completed', this)">✅ Tugallangan</button>
+                        </div>
+                    </div>
+                    <div id="contractsList" class="contracts-list"></div>
+                </div>
+            </section>
+
+            <!-- ===== EARNINGS SECTION (Upwork-style) ===== -->
+            <section id="section-earnings" class="content-section">
+                <!-- Earnings Overview -->
+                <div class="earnings-overview">
+                    <div class="earnings-card total">
+                        <div class="earnings-icon">💰</div>
+                        <div>
+                            <div class="earnings-amount" id="totalEarningsDetail">0 so'm</div>
+                            <div class="earnings-label">Jami daromad</div>
+                        </div>
+                    </div>
+                    <div class="earnings-card month">
+                        <div class="earnings-icon">📅</div>
+                        <div>
+                            <div class="earnings-amount" id="monthEarnings">0 so'm</div>
+                            <div class="earnings-label">Bu oy</div>
+                        </div>
+                    </div>
+                    <div class="earnings-card pending">
+                        <div class="earnings-icon">⏳</div>
+                        <div>
+                            <div class="earnings-amount" id="pendingEarnings">0 so'm</div>
+                            <div class="earnings-label">Kutilayotgan</div>
+                        </div>
+                    </div>
+                    <div class="earnings-card balance">
+                        <div class="earnings-icon">🏦</div>
+                        <div>
+                            <div class="earnings-amount" id="availableBalance">0 so'm</div>
+                            <div class="earnings-label">Mavjud balans</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Chart placeholder -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">📊 Daromad grafigi</h2>
+                        <select id="earningsFilter" class="sort-select" onchange="loadEarnings()">
+                            <option value="week">Hafta</option>
+                            <option value="month" selected>Oy</option>
+                            <option value="year">Yil</option>
+                        </select>
+                    </div>
+                    <div id="earningsChart" class="earnings-chart-container">
+                        <div class="chart-bars" id="chartBars"></div>
+                    </div>
+                </div>
+
+                <!-- Transactions List -->
+                <div class="card">
+                    <h2 class="card-title">💳 To'lovlar tarixi</h2>
+                    <div id="transactionsList" class="transactions-list"></div>
+                </div>
+            </section>
+
+            <!-- ===== REVIEWS SECTION ===== -->
+            <section id="section-reviews" class="content-section">
+                <div class="reviews-layout">
+                    <div class="card">
+                        <h2 class="card-title">⭐ Mening sharhlarim</h2>
+                        <div class="rating-overview">
+                            <div class="overall-rating" id="overallRating">
+                                <div class="rating-number">0.0</div>
+                                <div class="rating-stars" id="overallStars">☆☆☆☆☆</div>
+                                <div class="rating-count" id="ratingCount">0 ta sharh</div>
+                            </div>
+                            <div class="rating-breakdown" id="ratingBreakdown"></div>
+                        </div>
+                        <div id="reviewsList" class="reviews-list"></div>
+                    </div>
+
+                    <!-- Skills section (LinkedIn-style) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">🛠️ Ko'nikmalar</h2>
+                            <button class="btn-secondary btn-small" onclick="addSkill()">+ Qo'shish</button>
+                        </div>
+                        <div id="skillsList" class="skills-list"></div>
+
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0">
+
+                        <div class="card-header">
+                            <h2 class="card-title">🏆 Sertifikatlar</h2>
+                            <button class="btn-secondary btn-small" onclick="addCertificate()">+ Qo'shish</button>
+                        </div>
+                        <div id="certificatesList" class="certs-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PROFILE SECTION ===== -->
+            <section id="section-profile" class="content-section">
+                <!-- Worker Profile Card (LinkedIn-style) -->
+                <div class="profile-card-hero">
+                    <div class="profile-cover-bg"></div>
+                    <div class="profile-avatar-large" id="profileAvatarLarge">?</div>
+                    <div class="profile-hero-info">
+                        <h2 id="profileHeroName">Ism</h2>
+                        <p id="profileHeroTitle">Kasb</p>
+                        <p id="profileHeroLocation">📍 Joylashuv</p>
+                        <div class="profile-hero-stats">
+                            <div class="hero-stat">
+                                <span id="heroCompletedJobs">0</span>
+                                <small>Bajarilgan</small>
+                            </div>
+                            <div class="hero-stat">
+                                <span id="heroRating">0.0⭐</span>
+                                <small>Reyting</small>
+                            </div>
+                            <div class="hero-stat">
+                                <span id="heroExperience">0 yil</span>
+                                <small>Tajriba</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-hero-actions">
+                        <button class="btn-primary"
+                            onclick="document.getElementById('profileForm').scrollIntoView({behavior:'smooth'})">
+                            ✏️ Tahrirlash
+                        </button>
+                        <button class="btn-secondary" onclick="shareProfile()">
+                            🔗 Ulashish
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-edit-grid">
+                    <div class="card">
+                        <h2 class="card-title">✏️ Profil tahrirlash</h2>
+                        <form id="profileForm" class="profile-form" onsubmit="saveProfile(event)">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>To'liq ism</label>
+                                    <input type="text" id="profileName" placeholder="Ismingiz" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefon</label>
+                                    <input type="tel" id="profilePhone" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hudud</label>
+                                    <select id="profileRegion" required>
+                                        <option value="">Tanlang</option>
+                                        <option value="Toshkent">Toshkent</option>
+                                        <option value="Samarqand">Samarqand</option>
+                                        <option value="Buxoro">Buxoro</option>
+                                        <option value="Andijon">Andijon</option>
+                                        <option value="Farg'ona">Farg'ona</option>
+                                        <option value="Namangan">Namangan</option>
+                                        <option value="Qashqadaryo">Qashqadaryo</option>
+                                        <option value="Surxondaryo">Surxondaryo</option>
+                                        <option value="Xorazm">Xorazm</option>
+                                        <option value="Navoiy">Navoiy</option>
+                                        <option value="Sirdaryo">Sirdaryo</option>
+                                        <option value="Jizzax">Jizzax</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Asosiy kasb</label>
+                                    <select id="profileJobType" required>
+                                        <option value="">Tanlang</option>
+                                        <option value="Qurilish">🏗️ Qurilish</option>
+                                        <option value="Elektrik">⚡ Elektrik</option>
+                                        <option value="Santexnik">🔧 Santexnik</option>
+                                        <option value="Bog'dorchilik">🌿 Bog'dorchilik</option>
+                                        <option value="Duradgorlik">🪚 Duradgorlik</option>
+                                        <option value="Oshpazlik">👨‍🍳 Oshpazlik</option>
+                                        <option value="Tozalik">🧹 Tozalik</option>
+                                        <option value="Haydovchi">🚗 Haydovchi</option>
+                                        <option value="Sotuvchi">🛒 Sotuvchi</option>
+                                        <option value="Boshqa">Boshqa</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tajriba (yil)</label>
+                                    <input type="number" id="profileExperience" min="0" max="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>Kutilayotgan maosh (so'm/kun)</label>
+                                    <input type="number" id="profileExpectedSalary" min="0"
+                                        placeholder="Masalan: 200000">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Qo'shimcha ma'lumot</label>
+                                    <textarea id="profileDescription" rows="4"
+                                        placeholder="O'zingiz haqingizda qisqacha..."></textarea>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Mavjudlik holati</label>
+                                    <select id="profileAvailability">
+                                        <option value="available">✅ Hozir mavjud</option>
+                                        <option value="part_time">🕐 Yarim stavka</option>
+                                        <option value="weekends">📅 Faqat dam olish kunlari</option>
+                                        <option value="not_available">❌ Hozir mavjud emas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">💾 Saqlash</button>
+                        </form>
+                    </div>
+
+                    <!-- Skills editing panel -->
+                    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🛠️ Ko'nikmalar</h2>
+                                <button class="btn-secondary btn-small" onclick="addSkill()">+</button>
+                            </div>
+                            <div id="profileSkillsList" class="skills-edit-list"></div>
+                        </div>
+                        <div class="card">
+                            <h2 class="card-title">🔒 ID Verifikatsiya</h2>
+                            <div class="verification-status" id="verificationStatus"></div>
+                            <button class="btn-primary" style="margin-top:1rem; width:100%"
+                                onclick="requestVerification()">
+                                🪪 Hujjat yuborish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ALERTS SECTION ===== -->
+            <section id="section-alerts" class="content-section">
+                <div class="alerts-page-layout">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">🔔 Bildirishnomalar</h2>
+                            <button class="btn-secondary btn-small" onclick="markAllRead()">Barchasini o'qilgan</button>
+                        </div>
+                        <div id="notificationsList" class="notifications-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title">⚙️ Ish ogohlantirishlari</h2>
+                        <p style="color:var(--text-muted); margin-bottom:1rem">Yangi ishlar haqida xabar oling</p>
+                        <div id="alertsList" class="alerts-config-list"></div>
+                        <button class="btn-primary" style="margin-top:1rem; width:100%" onclick="createJobAlert()">
+                            + Yangi ogohlantirish yaratish
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Job Detail Modal -->
+    <div class="modal" id="jobDetailModal">
+        <div class="modal-overlay" onclick="closeJobModal()"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeJobModal()">✕</button>
+            <div id="jobDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Apply Modal (Upwork-style bid) -->
+    <div class="modal" id="applyModal">
+        <div class="modal-overlay" onclick="closeApplyModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeApplyModal()">✕</button>
+            <div id="applyContent"></div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-overlay" onclick="closeReviewModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReviewModal()">✕</button>
+            <div id="reviewContent"></div>
+        </div>
+    </div>
+
+    <!-- Premium Modal -->
+    <div class="modal" id="premiumModal">
+        <div class="modal-overlay" onclick="closePremiumModal()"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closePremiumModal()">✕</button>
+            <div id="premiumContent"></div>
+        </div>
+    </div>
+
+    <!-- Alert Create Modal -->
+    <div class="modal" id="alertModal">
+        <div class="modal-overlay" onclick="closeAlertModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAlertModal()">✕</button>
+            <div id="alertContent"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="demo-data.js"></script>
+    <script src="worker-dashboard-enhanced.js"></script>
+    <script src="worker-dashboard-extra.js"></script>
+</body>
+
+</html>
